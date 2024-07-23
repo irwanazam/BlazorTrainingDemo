@@ -1,0 +1,61 @@
+﻿@page "/products/form/{id:int?}"
+@using BlazorTrainingDemo.Data
+@using BlazorTrainingDemo.Domains
+@using MediatR
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.FluentUI.AspNetCore.Components
+
+
+@inject ApplicationDbContext context
+@inject NavigationManager NavigationManager
+@inject IMediator mediator
+
+@rendermode InteractiveServer
+
+<PageTitle>@(IsEditMode ? "Edit Product" : "Create Product")</PageTitle>
+
+<h3>@(IsEditMode ? "Edit Product" : "Create Product")</h3>
+
+<EditForm Model="@product" OnValidSubmit="HandleValidSubmit" FormName="product">
+    <DataAnnotationsValidator />
+    <FluentValidationSummary />
+
+    <FluentTextField Name="Name" @bind-Value="product.Name" label="Name" />
+
+    <FluentNumberField  Name="Price" @bind-Value="product.Price" label="Price"/>
+
+    <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">Submit</FluentButton>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private Product? product = new Product();
+
+    private bool IsEditMode => Id.HasValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsEditMode)
+        {
+            product = await context.Products.FindAsync(Id);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsEditMode)
+        {
+            await mediator.Send(new UpdateProductCommand(product));
+        }
+        else
+        {
+            await mediator.Send(new CreateProductCommand(product));
+        }
+
+        NavigationManager.NavigateTo("/");
+    }
+}

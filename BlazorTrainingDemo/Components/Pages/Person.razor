@@ -1,0 +1,11 @@
+﻿@page "/person/{name}"
+
+<h3>Person</h3>
+
+Hello @Name!
+
+@code {
+
+    [Parameter]
+    public string Name { get; set; }
+}
