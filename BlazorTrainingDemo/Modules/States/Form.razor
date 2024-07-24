@@ -1,0 +1,63 @@
+﻿@page "/states/form/{id:int?}"
+@using BlazorTrainingDemo.Data
+@using BlazorTrainingDemo.Domains
+@using MediatR
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.FluentUI.AspNetCore.Components
+
+
+@inject ApplicationDbContext context
+@inject NavigationManager NavigationManager
+@inject IMediator mediator
+
+@rendermode InteractiveServer
+
+<PageTitle>@(IsEditMode ? "Edit State" : "Create State")</PageTitle>
+
+<h3>@(IsEditMode ? "Edit State" : "Create State")</h3>
+
+<EditForm Model="@state" OnValidSubmit="HandleValidSubmit" FormName="state">
+    <DataAnnotationsValidator />
+    <FluentValidationSummary />
+
+    <FluentTextField Name="Name" @bind-Value="state.Name" label="Name" />
+
+    <FluentTextField Name="Capital" @bind-Value="state.Capital" label="Capital" />
+
+    <FluentNumberField  Name="QuotaTrainee" @bind-Value="state.QuotaTrainee" label="Trainee Quota Per State"/>
+
+    <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">Submit</FluentButton>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private State? state = new State();
+
+    private bool IsEditMode => Id.HasValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsEditMode)
+        {
+            state = await context.States.FindAsync(Id);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsEditMode)
+        {
+            await mediator.Send(new UpdateStateCommand(state));
+        }
+        else
+        {
+            await mediator.Send(new CreateStateCommand(state));
+        }
+
+        Console.WriteLine(state.Name + state.Capital + state.QuotaTrainee);
+    }
+}
