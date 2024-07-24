@@ -1,0 +1,60 @@
+﻿@page "/states"
+@attribute [StreamRendering]
+
+@using BlazorTrainingDemo.Data
+@using BlazorTrainingDemo.Domains
+@using BlazorTrainingDemo.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.FluentUI.AspNetCore.Components
+@inject ApplicationDbContext context
+@inject IAsyncQueryExecutor<State> stateQueryExecutor
+@inject NavigationManager NavigationManager
+
+<PageTitle>List States</PageTitle>
+
+<h1>States</h1>
+
+@if (statesQuery == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <FluentDataGrid Items="@statesQuery" TGridItem="State">
+        <PropertyColumn Title="Name" Property="@(c => c!.Name)" Sortable="true" Align="@Align.Start" />
+        <PropertyColumn Title="Capital" Property="@(c => c!.Capital)" Sortable="true" />
+        <PropertyColumn Title="Trainee Quota" Property="@(c => c!.QuotaTrainee)" Sortable="true" />
+        <TemplateColumn Title="Actions" Align="@Align.End">
+            <Template>
+                @if (context is State state)
+                {
+                    <FluentButton 
+                        aria-label="Edit item" 
+                        IconEnd="@(new Icons.Regular.Size16.Edit())" 
+                        OnClick="@(() => Redirect(state.Id))">
+                        Edit
+                    </FluentButton>
+                }
+            </Template>
+        </TemplateColumn>
+    </FluentDataGrid>
+}
+
+@code {
+    private IQueryable<State>? statesQuery;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        // Fetch states from the database
+        statesQuery = context.States.AsNoTracking(); // Ensure AsNoTracking is available
+    }
+
+    private void Redirect(int id)
+    {
+        NavigationManager.NavigateTo($"/states/form/{id}");
+    }
+}
