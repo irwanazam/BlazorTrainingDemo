@@ -1,5 +1,4 @@
 ﻿using BlazorTrainingDemo.Data;
-using BlazorTrainingDemo.Domains;
 using MediatR;
 
 namespace BlazorTrainingDemo.Modules.Products
@@ -28,7 +27,8 @@ namespace BlazorTrainingDemo.Modules.Products
             else
             {
                 product.Name = request.Product.Name;
-                product.Price = request.Product.Price;
+                product.Code = request.Product.Code;
+                product.Description = request.Product.Description;
                 _context.Products.Update(request.Product);
             }
 

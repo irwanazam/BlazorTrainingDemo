@@ -1,4 +1,5 @@
 using BlazorTrainingDemo.Domains;
+using BlazorTrainingDemo.Modules.Products;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

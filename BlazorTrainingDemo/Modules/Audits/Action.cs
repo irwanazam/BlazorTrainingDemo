@@ -18,28 +18,21 @@ namespace BlazorTrainingDemo.Modules.Audits
 
         public async Task Handle(ProductCreatedEvent evt, CancellationToken cancellationToken)
         {
-            try
+
+            _context.Logs.Add(new Logs
             {
-                _context.Logs.Add(new Logs
-                {
-                    Message = $"Product create {evt.Product.Name}",
-                    EventType = evt.GetType().Name,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = "System"
-                });
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-           
+                Message = $"Product create {evt.Product.Name}",
+                EventType = evt.GetType().Name,
+                CreatedAt = DateTime.Now,
+                CreatedBy = "System"
+            });
+            await _context.SaveChangesAsync();
+
         }
 
         public async Task Handle(ProductUpdatedEvent evt, CancellationToken cancellationToken)
         {
-            try
-            {
+
                 _context.Logs.Add(new Logs
                 {
                     Message = $"Product update {evt.Product.Name}",
@@ -48,12 +41,7 @@ namespace BlazorTrainingDemo.Modules.Audits
                     CreatedBy = "System"
                 });
                 await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
+           
         }
 
 

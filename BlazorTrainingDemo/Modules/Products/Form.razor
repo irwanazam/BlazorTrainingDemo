@@ -1,12 +1,6 @@
 ﻿@page "/products/form/{id:int?}"
-@using BlazorTrainingDemo.Data
-@using BlazorTrainingDemo.Domains
-@using MediatR
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.FluentUI.AspNetCore.Components
 
-
+<!--Dependency Injection-->
 @inject ApplicationDbContext context
 @inject NavigationManager NavigationManager
 @inject IMediator mediator
@@ -15,7 +9,10 @@
 
 <PageTitle>@(IsEditMode ? "Edit Product" : "Create Product")</PageTitle>
 
-<h3>@(IsEditMode ? "Edit Product" : "Create Product")</h3>
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
 
 <EditForm Model="@product" OnValidSubmit="HandleValidSubmit" FormName="product">
     <DataAnnotationsValidator />
@@ -23,7 +20,11 @@
 
     <FluentTextField Name="Name" @bind-Value="product.Name" label="Name" />
 
-    <FluentNumberField  Name="Price" @bind-Value="product.Price" label="Price"/>
+    <FluentTextField Name="Name" @bind-Value="product.Code" label="Code" />
+
+    <FluentTextField Name="Name" @bind-Value="product.Description" label="Description" />
+
+   @*  <FluentNumberField  Name="Price" @bind-Value="product.Price" label="Price"/> *@
 
     <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">Submit</FluentButton>
 
@@ -33,7 +34,11 @@
     [Parameter]
     public int? Id { get; set; }
 
-    private Product? product = new Product();
+    public string ErrorMessage { get; set; }
+
+    //[SupplyParameterFromForm] - Use SupplyParameterFromForm to bind the form data to the model as set and get property
+    //private Product? product = new Product();
+    private Product? product { set; get; }
 
     private bool IsEditMode => Id.HasValue;
 
@@ -43,19 +48,34 @@
         {
             product = await context.Products.FindAsync(Id);
         }
+        else
+        {
+            product = new Product();
+        }
     }
 
     private async Task HandleValidSubmit()
     {
-        if (IsEditMode)
+        try
         {
-            await mediator.Send(new UpdateProductCommand(product));
+            if (IsEditMode)
+            {
+                await mediator.Send(new UpdateProductCommand(product));
+            }
+            else
+            {
+                //DomainEvent - Event Bus
+                await mediator.Send(new CreateProductCommand(product));
+            }
+             NavigationManager.NavigateTo("/");
         }
-        else
+        catch (Exception ex)
         {
-            await mediator.Send(new CreateProductCommand(product));
+            //Log the exception
+            //Show the error message
+            ErrorMessage = ex.Message;
         }
-
-        NavigationManager.NavigateTo("/");
+       
+        
     }
 }
