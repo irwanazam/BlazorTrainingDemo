@@ -36,7 +36,7 @@
 
     public string ErrorMessage { get; set; }
 
-    //[SupplyParameterFromForm] - Use SupplyParameterFromForm to bind the form data to the model as set and get property
+    [SupplyParameterFromForm] //- Use SupplyParameterFromForm to bind the form data to the model as set and get property
     //private Product? product = new Product();
     private Product? product { set; get; }
 
@@ -76,6 +76,5 @@
             ErrorMessage = ex.Message;
         }
        
-        
     }
 }

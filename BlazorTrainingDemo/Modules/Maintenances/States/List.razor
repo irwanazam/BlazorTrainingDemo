@@ -1,5 +1,5 @@
 ﻿@page "/states"
-@attribute [StreamRendering]
+
 
 @using BlazorTrainingDemo.Data
 @using BlazorTrainingDemo.Domains
@@ -8,7 +8,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.FluentUI.AspNetCore.Components
 @inject ApplicationDbContext context
-@inject IAsyncQueryExecutor<State> stateQueryExecutor
+@inject IMediator mediator
 @inject NavigationManager NavigationManager
 
 <PageTitle>List States</PageTitle>
@@ -50,7 +50,11 @@ else
         await Task.Delay(500);
 
         // Fetch states from the database
-        statesQuery = context.States.AsNoTracking(); // Ensure AsNoTracking is available
+        //statesQuery = context.States.AsNoTracking(); // Ensure AsNoTracking is available
+
+        var _statesQuery = await mediator.Send(new GetStatesQuery());
+
+        statesQuery = _statesQuery.AsQueryable();
     }
 
     private void Redirect(int id)
